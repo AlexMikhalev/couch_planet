@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>Subscriptions</title>
+    <link rel="stylesheet" href="/_utils/style/layout.css" type="text/css">
+    <link rel="stylesheet" href="style/subscriptions.css" type="text/css">
+  </head>
+  <body>
+    <h1>Subscriptions</h1>
+    <div id="content">
+      <div id="account"></div>
+      <ul id="toolbar">
+        <li>
+          <button class="save">Save Subscriptions</button>
+        </li>
+        <li>
+          <button class="add">Add Subscription</button>
+        </li>
+      </ul>
+      <table id="fields" class="listing" cellspacing="0">
+        <col class="field"><col class="value">
+        <caption>Fields</caption>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>URL</th>
+          </tr>
+        </thead>
+        <tbody id="subscriptions" class="content"></tbody>
+        <tbody class="source" style="display: none">
+          <tr><td colspan="3"></td></tr>
+        </tbody>
+        <tbody class="footer">
+          <tr>
+            <td colspan="3">
+              <div id="paging">
+                <a class="prev">← Previous Version</a> | <a class="next">Next Version →</a>
+              </div>
+              <span></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+  <script src="/_utils/script/jquery.js"></script>
+  <script src="/_utils/script/jquery.couch.js"></script>
+  <script src="vendor/couchapp/jquery.couch.app.js"></script>
+  <script src="vendor/couchapp/jquery.couch.app.util.js"></script>
+  <script src="vendor/couchapp/jquery.evently.js"></script>
+  <script src="vendor/couchapp/jquery.mustache.js"></script>
+  <script src="/_utils/script/jquery.editinline.js"></script>
+  <script src="script/subscriptions.js"></script>
+  <script>
+    $.couch.app(function(app) {
+      $("#account").evently(app.ddoc.evently.account, app)
+      subscriptions.init()
+    })
+  </script>
+</html>

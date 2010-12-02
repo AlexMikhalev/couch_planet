@@ -1,0 +1,15 @@
+#account {
+  text-align: right;
+  margin-right: 5px;
+}
+
+#account input[type=submit] {
+  background-color: #666;
+  color: #FFF;
+  font-size: 90%;
+  cursor: pointer;
+}
+
+#toolbar {
+  margin-top: 0px;
+}

@@ -1,0 +1,12 @@
+{{#posts}}
+  <li id="{{link}}" class="entry">
+    <h3><a href="{{providerUrl}}">{{providerName}}</a></h3>
+    <h4><a href="{{link}}">{{title}}</a></h4>
+      <div class="body">
+        {{{body}}}
+        <p class="by">
+          by {{author}}, <span class="date">{{date}}</span>
+        </p>
+      </div>
+  </li>
+{{/posts}}

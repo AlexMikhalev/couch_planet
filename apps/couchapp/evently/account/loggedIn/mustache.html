@@ -1,0 +1,12 @@
+<span>Welcome 
+<a target="_new" href="/_utils/document.html?{{auth_db}}/org.couchdb.user%3A{{uri_name}}">{{name}}</a>! 
+<a href="#logout">Logout?</a>
+{{#main_page}}
+<br/>
+<a href="../../subscriptions.html"><i>Subscriptions</i></a>
+{{/main_page}}
+{{^main_page}}
+<br/>
+<a href="_list/index/recent-posts?descending=true&limit=10"><i>Main Page</i></a>
+{{/main_page}}
+</span>
