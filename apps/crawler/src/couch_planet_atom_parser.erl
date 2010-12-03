@@ -98,7 +98,7 @@ find_feed_entries(Xml, Acc) ->
 find_next_entry(Xml) ->
     case get(entry_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<entry>(.*?)</entry>">>,
+        {ok, MP} = re:compile(<<"<entry[^>]*?>(.*?)</entry>">>,
             [caseless, dotall]),
         put(entry_regex, MP);
     MP ->
