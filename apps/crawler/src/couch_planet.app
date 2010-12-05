@@ -10,5 +10,5 @@
   ]},
   {registered, [couch_planet_sup]},
   {mod, {couch_planet_app, []}},
-  {applications, [inets, kernel, sasl, stdlib]}
+  {applications, [inets, ssl, kernel, sasl, stdlib]}
  ]}.

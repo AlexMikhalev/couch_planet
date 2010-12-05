@@ -41,6 +41,7 @@ start() ->
     couch_planet_deps:ensure(),
     ensure_started(sasl),
     ensure_started(inets),
+    ensure_started(ssl),
     application:start(couch_planet).
 
 %% @spec stop() -> ok
@@ -53,6 +54,7 @@ stop() ->
 stop(Reason) ->
     error_logger:info_msg(io_lib:format("~p~n",[Reason])),
     Res = application:stop(couch_planet),
+    application:stop(ssl),
     application:stop(inets),
     application:stop(sasl),
     Res.
