@@ -42,8 +42,10 @@ xml2xml_text2json_text(Xml) ->
     nomatch -> Xml;
     {match, [Text]} -> Text
     end,
-    XmlText = re:replace(re:replace(Xml1, <<"&lt;">>, <<"<">>, [global, {return, binary}]), <<"&gt;">>, <<">">>, [global, {return, binary}]),
-    JsonText0 = re:replace(XmlText, <<"\"">>, <<"\\\\\"">>, [global, {return, binary}]),
+    XmlText0 = re:replace(Xml1, <<"&gt;">>, <<">">>, [global, {return, binary}]),
+    XmlText1 = re:replace(XmlText0, <<"&lt;">>, <<"<">>, [global, {return, binary}]),
+    XmlText2 = re:replace(XmlText1, <<"&amp;">>, <<"\\&">>, [global, {return, binary}]),
+    JsonText0 = re:replace(XmlText2, <<"\"">>, <<"\\\\\"">>, [global, {return, binary}]),
     case get(json_regex) of
     undefined ->
         {ok, MP1} = re:compile(<<"(\\\\\\\\)+\"">>),
