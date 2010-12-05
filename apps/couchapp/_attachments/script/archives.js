@@ -49,8 +49,8 @@ function Archives(yearClassName, monthClassName) {
 
   var as = $("#archives a")
   for (var i = 0; i < as.length; i++) {
-    if ($(document).getUrlParam("startkey") ==
-        $(as[i]).getUrlParam("startkey")) {
+    var startkey = $(document).getUrlParam("startkey")
+    if (startkey && startkey == $(as[i]).getUrlParam("startkey")) {
       as[i].style.fontWeight = "bold"
       break
     }

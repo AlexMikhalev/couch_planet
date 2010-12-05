@@ -99,8 +99,12 @@ h4 img, h5 img, h6 img {
   width: 67%;
 }
 
-#posts li {
+.entry {
   list-style: none;
+}
+
+.entry li {
+  list-style: disc;
 }
 
 a, a:link, a:visited {
@@ -133,6 +137,10 @@ img.face {
 
 .body textarea {
   width: 100%;
+}
+
+#loader {
+  margin-left: 20px;
 }
 
 /* Sidebar
