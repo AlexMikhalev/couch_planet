@@ -147,14 +147,11 @@ img.face {
 -------------------------------------------------------------- */
 
 .sidebar {
-  border-right: 1px solid #3E3E2E;
-  background: #FFF url(../images/sidebar.png);
+  background-color: #FFF;
   position: absolute;
   top: 0px;
-  left: 0px;
   width: 232px;
   padding: 20px 0 0 0;
-  height: 100%;
 }
 
 .sidebar h2 {
@@ -194,10 +191,9 @@ img.face {
 }
 
 .sidebar p {
-  border-top: 1px solid #84856A;
+  border-top: 1px solid #676767;
   margin-top: 30px;
   padding-top: 10px;
-  padding-left: 20px;
 }
 
 .sidebar .message {
@@ -210,6 +206,10 @@ img.face {
   background-color: #F00;
   color: #ffffff !important;
   text-decoration: none !important;
+}
+
+.sidebar .transition {
+  height: 8px;
 }
 
 /* Archives */
