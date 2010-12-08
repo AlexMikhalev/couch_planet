@@ -69,7 +69,7 @@ entry_time(Xml) ->
         Value -> Value
         end;
     Value ->
-        Value
+        xml2xml_text2json_text(Value)
     end.
 
 %% @spec complete_entry(binary(), #entry{}, binary()) -> #entry{}
@@ -150,7 +150,7 @@ entry_summary(Xml) ->
 entry_updated(Xml) ->
     case get(entry_updated_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<updated>(.*?)</updated>">>,
+        {ok, MP} = re:compile(<<"<updated[^>]*?>(.*?)</updated>">>,
             [caseless, dotall]),
         put(entry_updated_regex, MP);
     MP ->
@@ -158,14 +158,14 @@ entry_updated(Xml) ->
     end,
     case re:run(Xml, MP, [{capture, [1], binary}]) of
     nomatch -> <<>>;
-    {match, [Value]} -> Value
+    {match, [Value]} -> xml2xml_text2json_text(Value)
     end.
 
 %% @spec entry_published(binary()) -> binary()
 entry_published(Xml) ->
     case get(entry_published_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<published>(.*?)</published>">>,
+        {ok, MP} = re:compile(<<"<published[^>]*?>(.*?)</published>">>,
             [caseless, dotall]),
         put(entry_published_regex, MP);
     MP ->
@@ -173,14 +173,14 @@ entry_published(Xml) ->
     end,
     case re:run(Xml, MP, [{capture, [1], binary}]) of
     nomatch -> <<>>;
-    {match, [Value]} -> Value
+    {match, [Value]} -> xml2xml_text2json_text(Value)
     end.
 
 %% @spec entry_author_name(binary()) -> binary()
 entry_author_name(Xml) ->
     case get(entry_author_name_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<name>(.*?)</name>">>,
+        {ok, MP} = re:compile(<<"<name[^>]*?>(.*?)</name>">>,
             [caseless, dotall]),
         put(entry_author_name_regex, MP);
     MP ->
@@ -188,14 +188,14 @@ entry_author_name(Xml) ->
     end,
     case re:run(Xml, MP, [{capture, [1], binary}]) of
     nomatch -> <<>>;
-    {match, [Value]} -> Value
+    {match, [Value]} -> xml2xml_text2json_text(Value)
     end.
 
 %% @spec entry_author_uri(binary()) -> binary()
 entry_author_uri(Xml) ->
     case get(entry_author_uri_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<uri>(.*?)</uri>">>,
+        {ok, MP} = re:compile(<<"<uri[^>]*?>(.*?)</uri>">>,
             [caseless, dotall]),
         put(entry_author_uri_regex, MP);
     MP ->
@@ -203,5 +203,5 @@ entry_author_uri(Xml) ->
     end,
     case re:run(Xml, MP, [{capture, [1], binary}]) of
     nomatch -> <<>>;
-    {match, [Value]} -> Value
+    {match, [Value]} -> xml2xml_text2json_text(Value)
     end.
