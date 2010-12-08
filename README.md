@@ -25,7 +25,7 @@ Please see [http://couchapp.org](http://couchapp.org) for more information
 on CouchApps.
 
 
-## Deploying the Feed Crawler
+# Deploying the Feed Crawler
 
 In the `apps/crawler` directory, simply run `make`. Then, if everything was
 compiled successfully, you can now start the crawler from the same directory.
@@ -55,13 +55,9 @@ changes, just click "Save Subscriptions". When you log out (i.e., click
 
 # Version
 
-Version 1.0 – 2010-12-02
+Version 1.1.0 – 2010-12-08
 
-
-# Version History
-
-Version 1.0 – 2010-12-02
-    - Initial version.
+See `CHANGES.md` for details.
 
 
 # Contributors
