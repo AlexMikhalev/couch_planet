@@ -43,8 +43,8 @@ find_feed_entries(Xml) ->
 entry_link(Xml) ->
     case get(entry_link_regex_1) of
     undefined ->
-        {ok, MP1} = re:compile(<<"<link( +[^>]*?)*? rel=['\"]alternate['\"]( +[^>]*?)*?href=['\"]([^'\"]*?)['\"](( +[^>]*?)*?>|/>)">>, [caseless, dotall]),
-        {ok, MP2} = re:compile(<<"<link( +[^>]*?)*? href=['\"]([^'\"]*?)['\"]( +[^>]*?)*?rel=['\"]alternate['\"](( +[^>]*?)*?>|/>)">>, [caseless, dotall]),
+        {ok, MP1} = re:compile(<<"<link( +[^>]*?)*? rel=['\"]alternate['\"]( +[^>]*?)*?href=['\"]([^'\"]+?)['\"](( +[^>]*?)*?>|/>)">>, [caseless]),
+        {ok, MP2} = re:compile(<<"<link( +[^>]*?)*? href=['\"]([^'\"]+?)['\"]( +[^>]*?)*?rel=['\"]alternate['\"](( +[^>]*?)*?>|/>)">>, [caseless]),
         put(entry_link_regex_1, MP1),
         put(entry_link_regex_2, MP2);
     MP1 ->
