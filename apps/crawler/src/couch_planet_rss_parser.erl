@@ -24,13 +24,13 @@
 title(Xml) ->
     case get(title_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<title[^>]*?>(.*?)</title>">>,
+        {ok, MP} = re:compile(<<"<title( +[^>]*?)*?>(.*?)</title>">>,
             [caseless, dotall]),
         put(title_regex, MP);
     MP ->
         ok
     end,
-    case re:run(Xml, MP, [{capture, [1], binary}]) of
+    case re:run(Xml, MP, [{capture, [2], binary}]) of
     nomatch -> <<>>;
     {match, [Title]} -> xml2xml_text2json_text(Title)
     end.
@@ -43,12 +43,12 @@ find_feed_entries(Xml) ->
 entry_link(Xml) ->
     case get(entry_link_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<link[^>]*?>(.*?)</link>">>, [caseless, dotall]),
+        {ok, MP} = re:compile(<<"<link( +[^>]*?)*?>(.*?)</link>">>, [caseless, dotall]),
         put(entry_link_regex, MP);
     MP ->
         ok
     end,
-    case re:run(Xml, MP, [{capture, [1], binary}]) of
+    case re:run(Xml, MP, [{capture, [2], binary}]) of
     nomatch -> false;
     {match, [Link]} -> xml2xml_text2json_text(Link)
     end.
@@ -85,13 +85,13 @@ find_feed_entries(Xml, Acc) ->
 find_next_entry(Xml) ->
     case get(entry_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<item[^>]*?>(.*?)</item>">>,
+        {ok, MP} = re:compile(<<"<item( +[^>]*?)*?>(.*?)</item>">>,
             [caseless, dotall]),
         put(entry_regex, MP);
     MP ->
         ok
     end,
-    case re:run(Xml, MP, [{capture, [1]}]) of
+    case re:run(Xml, MP, [{capture, [2]}]) of
     nomatch -> false;
     {match, [{StartOffs, Length}]} -> {StartOffs, Length}
     end.
@@ -99,23 +99,9 @@ find_next_entry(Xml) ->
 entry_pub_date(Xml) ->
     case get(entry_pub_date_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<pubDate[^>]*?>(.*?)</pubDate>">>,
+        {ok, MP} = re:compile(<<"<pubDate( +[^>]*?)*?>(.*?)</pubDate>">>,
             [caseless, dotall]),
         put(entry_pub_date_regex, MP);
-    MP ->
-        ok
-    end,
-    case re:run(Xml, MP, [{capture, [1], binary}]) of
-    nomatch -> false;
-    {match, [Value]} -> xml2xml_text2json_text(Value)
-    end.
-
-entry_date(Xml) ->
-    case get(entry_date_regex) of
-    undefined ->
-        {ok, MP} = re:compile(<<"<([^>]*?:[^>]*?)date[^>]*?>(.*?)</\\1date>">>,
-            [caseless, dotall]),
-        put(entry_date_regex, MP);
     MP ->
         ok
     end,
@@ -124,17 +110,31 @@ entry_date(Xml) ->
     {match, [Value]} -> xml2xml_text2json_text(Value)
     end.
 
+entry_date(Xml) ->
+    case get(entry_date_regex) of
+    undefined ->
+        {ok, MP} = re:compile(<<"<([^>]*?:[^>]*?)date( +[^>]*?)*?>(.*?)</\\1date>">>,
+            [caseless, dotall]),
+        put(entry_date_regex, MP);
+    MP ->
+        ok
+    end,
+    case re:run(Xml, MP, [{capture, [3], binary}]) of
+    nomatch -> false;
+    {match, [Value]} -> xml2xml_text2json_text(Value)
+    end.
+
 %% @spec entry_content(binary()) -> binary()
 entry_content(Xml) ->
     case get(entry_content_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<description[^>]*?>(.*?)</description>">>,
+        {ok, MP} = re:compile(<<"<description( +[^>]*?)*?>(.*?)</description>">>,
             [caseless, dotall]),
         put(entry_content_regex, MP);
     MP ->
         ok
     end,
-    case re:run(Xml, MP, [{capture, [1], binary}]) of
+    case re:run(Xml, MP, [{capture, [2], binary}]) of
     nomatch -> <<>>;
     {match, [Content]} -> xml2xml_text2json_text(Content)
     end.
@@ -143,13 +143,13 @@ entry_content(Xml) ->
 entry_author(Xml) ->
     case get(entry_author_regex) of
     undefined ->
-        {ok, MP} = re:compile(<<"<author[^>]*?>(.*?)</author>">>,
+        {ok, MP} = re:compile(<<"<author( +[^>]*?)*?>(.*?)</author>">>,
             [caseless, dotall]),
         put(entry_author_regex, MP);
     MP ->
         ok
     end,
-    case re:run(Xml, MP, [{capture, [1], binary}]) of
+    case re:run(Xml, MP, [{capture, [2], binary}]) of
     nomatch -> <<>>;
     {match, [Value]} -> xml2xml_text2json_text(Value)
     end.

@@ -29,7 +29,9 @@ start([DdocUrl]) ->
         error_logger:error_msg("Cannot start: the URL of the couch_planet design document must be specified. For example: 'http://127.0.0.1:5984/couch_planet/_design/couch_planet'"),
         exit("invalid design document URL");
     _ ->
-        BulkDocsUrl = string:substr(Url, 1, Offs) ++ "_bulk_docs",
+        DbUrl = string:substr(Url, 1, Offs - 1),
+        BulkDocsUrl = DbUrl ++ "/_bulk_docs",
+        application:set_env(couch_planet, db_url, DbUrl),
         application:set_env(couch_planet, bulk_docs_url, BulkDocsUrl),
         application:set_env(couch_planet, ddoc_url, Url),
         start()

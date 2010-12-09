@@ -25,7 +25,7 @@
 }).
 
 -record(provider, {
-id = <<>>,
+    id = <<>>,
     name = <<>>,
     objectType = <<"service">>
 }).
