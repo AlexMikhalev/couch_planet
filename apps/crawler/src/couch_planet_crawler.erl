@@ -137,7 +137,7 @@ parse_bulk_docs_response(B) ->
                 {error, "no 'id' field in bulk update response"};
             {<<"id">>, Id} ->
                 case lists:keyfind(<<"rev">>, 1, TupleList) of
-                false -> {error, "no 'rev' field in bulk update response"};
+                false -> {error, "could not update '" ++ ?b2l(Id)} ++ "'";
                 {<<"rev">>, Rev} -> [{Id, Rev}|Acc]
                 end
             end
