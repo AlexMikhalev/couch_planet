@@ -12,7 +12,7 @@
 -include("couch_planet.hrl").
 
 %% user interface
--export([new_entries/4, xml2xml_text2json_text/1]).
+-export([new_entries/4]).
 
 
 % External API
@@ -28,32 +28,6 @@ new_entries(Xml, ContentType, Url, StatusTable) ->
     Provider = #provider{id = ?l2b(Url), name = Module:title(Xml)},
     EntriesXml = Module:find_feed_entries(Xml),
     get_new_entries(Module, EntriesXml, Provider, StatusTable).
-
-%% @spec xml2xml_text2json_text(binary()) -> binary()
-xml2xml_text2json_text(Xml) ->
-    case get(cdata_regex) of
-    undefined ->
-        {ok, MP} = re:compile(<<"<!\\[CDATA\\[(.*?)\\]\\]>">>, [dotall]),
-        put(cdata_regex, MP);
-    MP ->
-        ok
-    end,
-    Xml1 = case re:run(Xml, MP, [{capture, [1], binary}]) of
-    nomatch -> Xml;
-    {match, [Text]} -> Text
-    end,
-    XmlText0 = re:replace(Xml1, <<"&gt;">>, <<">">>, [global, {return, binary}]),
-    XmlText1 = re:replace(XmlText0, <<"&lt;">>, <<"<">>, [global, {return, binary}]),
-    XmlText2 = re:replace(XmlText1, <<"&amp;">>, <<"\\&">>, [global, {return, binary}]),
-    JsonText0 = re:replace(XmlText2, <<"\"">>, <<"\\\\\"">>, [global, {return, binary}]),
-    case get(json_regex) of
-    undefined ->
-        {ok, MP1} = re:compile(<<"(\\\\\\\\)+\"">>),
-        put(json_regex, MP1);
-    MP1 ->
-        ok
-    end,
-    re:replace(JsonText0, MP1, <<"\\1\\\\\"">>, [global, {return, binary}]).
 
 
 %% Internal API

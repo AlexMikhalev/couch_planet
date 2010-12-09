@@ -15,7 +15,7 @@
 -export([title/1, find_feed_entries/1,
          entry_link/1, entry_time/1, complete_entry/3]).
 
--import(couch_planet_parser, [xml2xml_text2json_text/1]).
+-import(couch_planet_utils, [xml2xml_text2json_text/1]).
 
 
 % External API
