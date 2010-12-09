@@ -43,14 +43,14 @@ find_feed_entries(Xml) ->
 entry_link(Xml) ->
     case get(entry_link_regex_1) of
     undefined ->
-        {ok, MP1} = re:compile(<<"<link( +[^>]*?)*? rel=['\"]alternate['\"][^>]*?href=['\"]([^'\"]*?)['\"]( +[^>]*?)*?>">>, [caseless, dotall]),
-        {ok, MP2} = re:compile(<<"<link( +[^>]*?)*? href=['\"]([^'\"]*?)['\"][^>]*?rel=['\"]alternate['\"]( +[^>]*?)*?">>, [caseless, dotall]),
+        {ok, MP1} = re:compile(<<"<link( +[^>]*?)*? rel=['\"]alternate['\"]( +[^>]*?)*?href=['\"]([^'\"]*?)['\"](( +[^>]*?)*?>|/>)">>, [caseless, dotall]),
+        {ok, MP2} = re:compile(<<"<link( +[^>]*?)*? href=['\"]([^'\"]*?)['\"]( +[^>]*?)*?rel=['\"]alternate['\"](( +[^>]*?)*?>|/>)">>, [caseless, dotall]),
         put(entry_link_regex_1, MP1),
         put(entry_link_regex_2, MP2);
     MP1 ->
         ok
     end,
-    case re:run(Xml, MP1, [{capture, [2], binary}]) of
+    case re:run(Xml, MP1, [{capture, [3], binary}]) of
     nomatch ->
         case re:run(Xml, get(entry_link_regex_2), [{capture, [2], binary}]) of
         nomatch -> false;
