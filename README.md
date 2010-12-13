@@ -55,7 +55,7 @@ changes, just click "Save Subscriptions". When you log out (i.e., click
 
 # Version
 
-Version 1.1.0 – 2010-12-08
+Version 1.1.1 – 2010-12-13
 
 See `CHANGES.md` for details.
 

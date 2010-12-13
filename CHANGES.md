@@ -1,5 +1,14 @@
 # couch_planet CHANGES
 
+
+## Version 1.1.1
+
+### Crawler:
+
+* Improved parsers.
+* Improved error logging.
+
+
 ## Version 1.1.0
 
 ### Crawler:
