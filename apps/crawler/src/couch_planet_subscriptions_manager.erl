@@ -100,7 +100,7 @@ read_config(Url, ETag) ->
     {ok, {{_, 200, _}, Headers, Body}} ->
         case parse_config(Body) of
         {error, Reason} ->
-            error_logger:error_msg("configuration parse error~nConfiguration parse error - ~p~n", [Reason]),
+            error_logger:error_msg("cannot parse configuration from ~p - ~p~n", [Url, Reason]),
             timer:sleep(?UPDATE_INTERVAL),
             read_config(Url, ETag);
         Urls ->

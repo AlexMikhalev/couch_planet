@@ -66,7 +66,7 @@ start(Url) ->
     {ok, {200, Body}} ->
         case parse_update_status_view(Body) of
         {error, Reason} ->
-            error_logger:error_msg("View parse error - ~p~n", [Reason]),
+            error_logger:error_msg("cannot parse update status view for feed ~p - ~p~n", [Url, Reason]),
             timer:sleep(?UPDATE_INTERVAL),
             start(Url);
         UpdateStatus ->
@@ -90,7 +90,7 @@ loop(Url, StatusTable, DocHash) ->
     {ok, {NewDocHash, ContentType, Doc}} ->
         case couch_planet_parser:new_entries(Doc, ContentType, Url, StatusTable) of
         {error, Reason} ->
-            error_logger:error_msg("Feed parse error - ~p~n", [Reason]);
+            error_logger:error_msg("cannot parse feed from ~p - ~p~n", [Url, Reason]);
         [] ->
             ok;
         Entries ->
@@ -235,11 +235,10 @@ get_doc_if_modified(Url, DocHash) ->
 %% @spec get_etag_header([{string(), string()}]) -> undefined | string()
 get_etag_header([]) ->
     undefined;
-get_etag_header([{K, V}|T]) ->
-    case K of
-    "etag" -> V;
-    _ -> get_etag_header(T)
-    end.
+get_etag_header([{"etag", Value}|_]) ->
+    Value;
+get_etag_header([_|T]) ->
+    get_etag_header(T).
 
 get_content_type_from_header([]) ->
     unknown;
