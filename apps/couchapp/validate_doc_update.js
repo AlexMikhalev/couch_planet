@@ -1,7 +1,4 @@
 function (newDoc, oldDoc, userCtx, secObj) {
-  var v = require("lib/validate").init(newDoc, oldDoc, userCtx, secObj)
-
-  if (!v.isAdmin()) {    
-    v.unauthorized("Only admin users may update the database.")
-  }
+  if (userCtx.roles.indexOf("_admin") == -1)
+    throw({unauthorized : "Only admin users may update the database."})
 }
