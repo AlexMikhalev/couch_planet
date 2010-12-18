@@ -57,23 +57,23 @@ start(Url) ->
     case http:request(get, {ViewUrl, []}, ?HTTP_OPTIONS, Options) of
     {error, Reason} ->
         error_logger:error_msg("get: ~p - ~p~n", [ViewUrl, Reason]),
-        timer:sleep(?UPDATE_INTERVAL),
-        start(Url);
-    {ok, {Code, _Body}} when Code =/= 200 ->
-        error_logger:error_msg("get: ~p - ~p~n", [ViewUrl, Code]),
-        timer:sleep(?UPDATE_INTERVAL),
+        timer:sleep(?RETRY_INTERVAL),
         start(Url);
     {ok, {200, Body}} ->
         case parse_update_status_view(Body) of
         {error, Reason} ->
             error_logger:error_msg("cannot parse update status view for feed ~p - ~p~n", [Url, Reason]),
-            timer:sleep(?UPDATE_INTERVAL),
+            timer:sleep(?RETRY_INTERVAL),
             start(Url);
         UpdateStatus ->
-            StatusTable = ets:new(update_status, [private, set]),
+            StatusTable = ets:new(update_status, [public, set]),
             ets:insert(StatusTable, UpdateStatus),
             loop(Url, StatusTable)
-        end
+        end;
+    {ok, {Code, _Body}} ->
+        error_logger:error_msg("get: ~p - ~p~n", [ViewUrl, Code]),
+        timer:sleep(?RETRY_INTERVAL),
+        start(Url)
     end.
 
 %% @spec loop(string(), tid()) -> none()
@@ -94,7 +94,11 @@ loop(Url, StatusTable, DocHash) ->
         [] ->
             ok;
         Entries ->
-            do_bulk_docs_request(entries_to_json(Entries), StatusTable)
+            do_bulk_docs_request(entries_to_json(Entries), StatusTable),
+            case couch_planet:get_app_env(fetch_images) of
+            true -> fetch_images(Entries, StatusTable);
+            _ -> ok
+            end
         end
     end,
     timer:sleep(?UPDATE_INTERVAL),
@@ -107,11 +111,7 @@ do_bulk_docs_request(Json, StatusTable) ->
     case http:request(post, {BulkDocsUrl, [], "application/json", Json}, ?HTTP_OPTIONS, Options) of
     {error, Reason} ->
         error_logger:error_msg("post: ~p - ~p~n", [BulkDocsUrl, Reason]),
-        timer:sleep(?UPDATE_INTERVAL),
-        do_bulk_docs_request(Json, StatusTable);
-    {ok, {Code, _Body}} when Code =/= 201 ->
-        error_logger:error_msg("post: ~p - ~p~n", [BulkDocsUrl, Code]),
-        timer:sleep(?UPDATE_INTERVAL),
+        timer:sleep(?RETRY_INTERVAL),
         do_bulk_docs_request(Json, StatusTable);
     {ok, {201, ResJson}} ->
         case parse_bulk_docs_response(ResJson) of
@@ -123,7 +123,11 @@ do_bulk_docs_request(Json, StatusTable) ->
                     true = ets:update_element(StatusTable, Id, {3, Rev})
                 end, IdRevTuples),
             ok
-        end
+        end;
+    {ok, {Code, _Body}} ->
+        error_logger:error_msg("post: ~p - ~p~n", [BulkDocsUrl, Code]),
+        timer:sleep(?RETRY_INTERVAL),
+        do_bulk_docs_request(Json, StatusTable)
     end.
 
 %% @spec parse_bulk_docs_response(binary()) -> [{binary(), binary()}] | {error, Reason}
@@ -193,9 +197,6 @@ get_doc_if_modified(Url, DocHash) ->
     {error, Reason} ->
         error_logger:error_msg("head: ~p - ~p~n", [Url, Reason]),
         {error, Reason};
-    {ok, {{_, Code, _}, _Headers, _Body}} when Code =/= 200 ->
-        error_logger:error_msg("head: ~p - ~p~n", [Url, Code]),
-        {error, Code};
     {ok, {{_, 200, _}, Headers, _}} ->
         DocHash1 = get_etag_header(Headers),
         case DocHash1 of
@@ -206,9 +207,6 @@ get_doc_if_modified(Url, DocHash) ->
             {error, Reason} ->
                 error_logger:error_msg("get: ~p - ~p~n", [Url, Reason]),
                 {error, Reason};
-            {ok, {{_, Code, _}, _, _}} when Code =/= 200 ->
-                error_logger:error_msg("get: ~p - ~p~n", [Url, Code]),
-                {error, Code};
             {ok, {{_, 200, _}, Headers1, Body}} ->
                 NewDocHash = case DocHash1 of
                 undefined ->
@@ -227,9 +225,29 @@ get_doc_if_modified(Url, DocHash) ->
                     _ -> ContentType0
                     end,
                     {ok, {NewDocHash, ContentType, Body}}
-                end
+                end;
+            {ok, {{_, Code, _}, _, _}} ->
+                error_logger:error_msg("get: ~p - ~p~n", [Url, Code]),
+                {error, Code}
             end
-        end
+        end;
+    {ok, {{_, Code, _}, _, _}} ->
+        error_logger:error_msg("head: ~p - ~p~n", [Url, Code]),
+        {error, Code}
+    end.
+
+%% @spec fetch_images([#entry{}], tid()) -> ok
+fetch_images(Entries, StatusTable) ->
+    EntryUrlsTuples = couch_planet_image_persister:preprocess_entries(Entries,
+        StatusTable),
+    case EntryUrlsTuples of
+    [] ->
+        ok;
+    _ ->
+        Entries1 = [element(1, Tuple) || Tuple <- EntryUrlsTuples],
+        do_bulk_docs_request(entries_to_json(Entries1), StatusTable),
+        IdUrlsTuples = [{Entry#entry.id, Urls} || {Entry, Urls} <- EntryUrlsTuples],
+        couch_planet_image_persister:attach_images(IdUrlsTuples, StatusTable)
     end.
 
 %% @spec get_etag_header([{string(), string()}]) -> undefined | string()

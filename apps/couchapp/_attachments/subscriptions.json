@@ -1,9 +1,0 @@
-{
-  "topics": [
-    {"title": "Planet CouchDB", "description": "Planet CouchDB", "url": "http://planet.couchdb.org/atom.xml"},
-    {"title": "Planet Erlang", "description": "Planet Erlang is an Erlang community news site.", "url": "http://planeterlang.org/en/planet/rss_2.0"},
-    {"title": "Lambda the Ultimate", "description": "Lambda the Ultimate | Programming Languages Weblog", "url": "http://lambda-the-ultimate.org/rss.xml"},
-    {"title": "Unhappy Hipsters", "description": "It's Lonely in the Modern World",  "url": "http://feeds.feedburner.com/unhappyhipsters"},
-    {"title": "Stevey's Blog Rants", "description": "Random whining and stuff.", "url": "http://steve-yegge.blogspot.com/atom.xml"}
-  ]
-}

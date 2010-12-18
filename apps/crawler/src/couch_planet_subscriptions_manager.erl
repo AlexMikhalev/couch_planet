@@ -93,7 +93,7 @@ read_config(Url, ETag) ->
     case http:request(get, {Url, [{"If-None-Match", ETag}]}, ?HTTP_OPTIONS, [{body_format, binary}]) of
     {error, Reason} ->
         error_logger:error_msg("cannot read configuration~nget: ~p - ~p~n", [Url, Reason]),
-        timer:sleep(?UPDATE_INTERVAL),
+        timer:sleep(?RETRY_INTERVAL),
         read_config(Url, ETag);
     {ok, {{_, 304, _}, _, _}} ->
         {ok, not_modified};
@@ -101,14 +101,14 @@ read_config(Url, ETag) ->
         case parse_config(Body) of
         {error, Reason} ->
             error_logger:error_msg("cannot parse configuration from ~p - ~p~n", [Url, Reason]),
-            timer:sleep(?UPDATE_INTERVAL),
+            timer:sleep(?RETRY_INTERVAL),
             read_config(Url, ETag);
         Urls ->
             {ok, Urls, get_etag_header(Headers)}
         end;
-    {ok, {{_, Code, _}, _Headers, _Body}} when Code =/= 200 ->
+    {ok, {{_, Code, _}, _Headers, _Body}} ->
         error_logger:error_msg("cannot read configuration~nget: ~p - ~p~n", [Url, Code]),
-        timer:sleep(?UPDATE_INTERVAL),
+        timer:sleep(?RETRY_INTERVAL),
         read_config(Url, ETag)
     end.
 

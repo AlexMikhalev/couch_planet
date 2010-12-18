@@ -11,7 +11,7 @@
 -include("couch_planet.hrl").
 
 %% user interface
--export([start/0, start/1, stop/0]).
+-export([start/1, stop/0]).
 %% intermodule exports
 -export([get_app_env/1, get_app_env/2]).
 
@@ -20,31 +20,34 @@
 
 %% @spec start([string()]) -> ok
 %% @doc Start couch_planet.
-%%      `ConfigPath' specifies the location of the couch_planet design document.
 start([DdocUrl]) ->
-    Url = string:strip(DdocUrl, right, $/),
-    Offs = string:str(Url, "/_design"),
-    case Offs of
-    0 ->
-        error_logger:error_msg("Cannot start: the URL of the couch_planet design document must be specified. For example: 'http://127.0.0.1:5984/couch_planet/_design/couch_planet'"),
-        exit("invalid design document URL");
+    start1(DdocUrl);
+start(Args) when length(Args) =:= 2->
+    [A1, A2] = Args,
+    case A1 of
+    "fetch-images" ->
+        application:set_env(couch_planet, fetch_images, true),
+        start1(A2);
+    "fetch-audio" ->
+        application:set_env(couch_planet, fetch_audio, true),
+        start1(A2);
     _ ->
-        DbUrl = string:substr(Url, 1, Offs - 1),
-        BulkDocsUrl = DbUrl ++ "/_bulk_docs",
-        application:set_env(couch_planet, db_url, DbUrl),
-        application:set_env(couch_planet, bulk_docs_url, BulkDocsUrl),
-        application:set_env(couch_planet, ddoc_url, Url),
-        start()
+        bye()
+    end;
+start(Args) when length(Args) =:= 3->
+    [A1, A2, A3] = Args,
+    case A1 of
+    "fetch-images" when A2 =:= "fetch-audio" ->
+        application:set_env(couch_planet, fetch_images, true),
+        application:set_env(couch_planet, fetch_audio, true),
+        start1(A3);
+    "fetch-audio" when A2 =:= "fetch-images" ->
+        application:set_env(couch_planet, fetch_audio, true),
+        application:set_env(couch_planet, fetch_images, true),
+        start1(A3);
+    _ ->
+        bye()
     end.
-
-%% @spec start() -> ok
-%% @doc Start the couch_planet server.
-start() ->
-    couch_planet_deps:ensure(),
-    ensure_started(sasl),
-    ensure_started(inets),
-    ensure_started(ssl),
-    application:start(couch_planet).
 
 %% @spec stop() -> ok
 %% @doc Stop the couch_planet application and the calling process.
@@ -83,6 +86,34 @@ get_app_env(Opt, Default) ->
 
 
 %% Internal API
+
+%% @spec start1(string()) -> ok
+start1(DdocUrl) ->
+    Url = string:strip(DdocUrl, right, $/),
+    Offs = string:str(Url, "/_design"),
+    case Offs of
+    0 ->
+        exit("invalid design document URL");
+    _ ->
+        DbUrl = string:substr(Url, 1, Offs - 1),
+        BulkDocsUrl = DbUrl ++ "/_bulk_docs",
+        application:set_env(couch_planet, db_url, DbUrl),
+        application:set_env(couch_planet, bulk_docs_url, BulkDocsUrl),
+        application:set_env(couch_planet, ddoc_url, Url),
+        start()
+    end.
+
+%% @spec start() -> ok
+%% @doc Start the couch_planet server.
+start() ->
+    couch_planet_deps:ensure(),
+    ensure_started(sasl),
+    ensure_started(inets),
+    ensure_started(ssl),
+    application:start(couch_planet).
+
+bye() ->
+    exit("invalid design document URL").
 
 ensure_started(App) ->
     case application:start(App) of

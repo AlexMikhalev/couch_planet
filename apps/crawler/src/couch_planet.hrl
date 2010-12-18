@@ -1,5 +1,7 @@
 -define(UPDATE_INTERVAL, 180000).
 
+-define(RETRY_INTERVAL, 60000).
+
 -define(HTTP_OPTIONS, [{timeout, 120000}, {connect_timeout, 20000}]).
 
 -define(a2l(V), atom_to_list(V)).
